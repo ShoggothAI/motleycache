@@ -49,7 +49,7 @@ set_cache_location("/path/to/cache/dir")  # relative or absolute
 
 ### Advanced options
 There is an option to block all non-cached requests. It is particularly useful for testing your applications.  
-Motleycache will raise a `StrongCacheException` whenever there's no cache for a request:
+Motleycache will raise a `StrongCacheException` in case of a cache miss:
 ```python
 from motleycache import set_strong_cache
 set_strong_cache(True)  # turn on
