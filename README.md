@@ -56,11 +56,11 @@ set_strong_cache(True)  # turn on
 set_strong_cache(False)  # turn off
 ```
 
-If you want to only use existing cache, this option will disable updating the cache with new requests:
+If you want to only use existing cache, you can disable updating the cache with new requests:
 ```python
 from motleycache import set_update_cache_if_exists
-set_update_cache_if_exists(True)  # turn on
-set_update_cache_if_exists(False)  # turn off
+set_update_cache_if_exists(False)  # disable
+set_update_cache_if_exists(True)  # enable
 ```
 
 
