@@ -70,7 +70,7 @@ To find out more, see our [Caching and observability](https://motleycrew.readthe
 
 
 ## How it works
-When `enable_cache` is called, we decorate the request functions of supported clients with our caching wrapper. When a request is made to a cacheable URL, a hash of all its parameters is computed, and the corresponding cache file (containing pickled response) is retrieved if it exists, and its contents are unpickled and returned to the caller.  
+When `enable_cache` is called, we decorate the request functions of supported clients with our caching wrapper. When a request is made to a cacheable URL, a hash of all its parameters is computed, the corresponding cache file (containing pickled response) is retrieved if it exists, and its unpickled contents are returned to the caller.  
 In case of a cache miss, the request is passed on to the original client function (unless strong caching is enabled), and the response is then added to the cache (unless cache updating is turned off).
 
 If you use some other HTTP client and want us to support it, please raise an issue in this repo. Contributions are also welcome!
