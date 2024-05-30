@@ -65,5 +65,12 @@ set_update_cache_if_exists(False)  # turn off
 
 
 ## Motleycrew and Lunary integration
-Motleycache was first designed to be a part of our multi-agent framework [motleycrew](https://github.com/ShoggothAI/motleycrew) (check it out!), but we soon decided to instead make it a separate lightweight library. Because of that, motleycache also provides integration with [Lunary](https://github.com/lunary-ai/lunary) observability platform, so that cached calls are indicated in your traces.  
+Motleycache was first designed to be a part of our multi-agent framework [motleycrew](https://github.com/ShoggothAI/motleycrew) (check it out!), but we soon decided to make it a separate lightweight library instead. Because of that, motleycache also provides integration with [Lunary](https://github.com/lunary-ai/lunary) observability platform, so that cached calls are indicated in your traces.  
 To find out more, see our [Caching and observability](https://motleycrew.readthedocs.io/en/latest/caching_observability.html) docs page.
+
+
+## How it works
+When `enable_cache` is called, we decorate the request functions of supported clients with our caching wrapper. When a request is made to a cacheable URL, a hash of all its parameters is computed, and the corresponding cache file (containing pickled response) is retrieved if it exists, and its contents are unpickled and returned to the caller.  
+In case of a cache miss, the request is passed on to the original client function (unless strong caching is enabled), and the response is then added to the cache (unless cache updating is turned off).
+
+If you use some other HTTP client and want us to support it, please raise an issue in this repo. Contributions are also welcome!
