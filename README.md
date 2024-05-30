@@ -1,8 +1,8 @@
 # motleycache
 
-A universal caching engine for LLM apps and beyond.
+Disk-based http caching for LLM apps and beyond.
 
-Motleycache caches LLM and tool calls, as well as other web requests out of the box.
+Motleycache caches LLM and tool calls, as well as other web requests.
 It works with all requests made using most popular Python HTTP clients: [requests](https://github.com/psf/requests), [HTTPX](https://github.com/projectdiscovery/httpx), and [Curl CFFI](https://github.com/yifeikong/curl_cffi).
 
 
