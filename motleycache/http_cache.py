@@ -23,12 +23,14 @@ from curl_cffi.requests import Headers as CurlCFFI__Headers
 
 try:
     from lunary import track_event, run_ctx, event_queue_ctx
+    from lunary import queue as lunary_main_queue
 
     do_update_lunary_event = True
 except ImportError:
     track_event = None
     run_ctx = None
     event_queue_ctx = None
+    lunary_main_queue = None
     do_update_lunary_event = False
 
 
@@ -242,13 +244,19 @@ class BaseHttpCache(ABC):
         if not do_update_lunary_event:
             return
 
+        try:
+            callback_queue = event_queue_ctx.get()
+        except LookupError:
+            callback_queue = lunary_main_queue
+
         event_params = {
             "run_type": run_type,
             "event_name": "update",
             "run_id": run_id,
-            "callback_queue": event_queue_ctx.get(),
+            "callback_queue": callback_queue,
             "app_id": app_id,
         }
+
         if is_cache:
             event_params["metadata"] = {"cache": True}
 
