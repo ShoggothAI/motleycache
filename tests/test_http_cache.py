@@ -126,3 +126,11 @@ def test_http_cache_objects(library):
     set_strong_cache(False)
     disable_cache()
     assert library_method == get_library_method(library_name)
+
+@pytest.mark.parametrize("library", [requests, httpx, curl_cffi])
+def test_get_response_status_code(library):
+    library_name = library.__name__
+    response = make_request(library_name, strong_cache_url)
+    caching_obj = get_caching_obj(library_name)
+    response_status_code = caching_obj.get_response_status_code(response)
+    assert isinstance(response_status_code, int)

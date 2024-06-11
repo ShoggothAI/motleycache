@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "motleycache"
-version = "0.0.2"
+version = "0.0.3"
 description = "Package for caching http requests"
 authors = ["MotleyCrew <github@motleycrew.ai>"]
 readme = "README.md"

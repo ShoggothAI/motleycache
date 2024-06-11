@@ -120,12 +120,18 @@ class BaseHttpCache(ABC):
     def _disable(self):
         """Replacing the caching function with the original one"""
 
+    @abstractmethod
+    def get_response_status_code(self, response: Any) -> int:
+        """Return response status code"""
+
     def enable(self):
         """Enable caching"""
         self._enable()
         self.is_caching = True
 
-        library_log = "for {} library.".format(self.library_name) if self.library_name else "."
+        library_log = (
+            "for {} library.".format(self.library_name) if self.library_name else "."
+        )
         logger.info("Enable caching {} class {}".format(self.__class__, library_log))
 
     def disable(self):
@@ -133,7 +139,9 @@ class BaseHttpCache(ABC):
         self._disable()
         self.is_caching = False
 
-        library_log = "for {} library.".format(self.library_name) if self.library_name else "."
+        library_log = (
+            "for {} library.".format(self.library_name) if self.library_name else "."
+        )
         logger.info("Disable caching {} class {}".format(self.__class__, library_log))
 
     def prepare_response(self, response: Any) -> Any:
@@ -170,7 +178,8 @@ class BaseHttpCache(ABC):
             root_dir
             / shorten_filename(url_parsed.hostname, length=CACHE_FILENAME_LENGTH_LIMIT)
             / shorten_filename(
-                url_parsed.path.strip("/").replace("/", "_"), length=CACHE_FILENAME_LENGTH_LIMIT
+                url_parsed.path.strip("/").replace("/", "_"),
+                length=CACHE_FILENAME_LENGTH_LIMIT,
             )
         )
         cache_dir.mkdir(parents=True, exist_ok=True)
@@ -212,7 +221,15 @@ class BaseHttpCache(ABC):
         # Otherwise, call the function and save its result to the cache
         result = func(*args, **kwargs)
 
-        self.write_to_cache(result, cache_file, url)
+        response_status_code = self.get_response_status_code(result)
+        if response_status_code < 400:  # 4xx and 5xx status codes are not cached
+            self.write_to_cache(result, cache_file, url)
+        else:
+            logger.info(
+                "Not writing cache for URL {} because of error in response ({})".format(
+                    url, response_status_code
+                )
+            )
         return result
 
     async def aget_response(self, func: Callable, *args, **kwargs) -> Any:
@@ -232,7 +249,15 @@ class BaseHttpCache(ABC):
         # Otherwise, call the function and save its result to the cache
         result = await func(*args, **kwargs)
 
-        self.write_to_cache(result, cache_file, url)
+        response_status_code = self.get_response_status_code(result)
+        if response_status_code < 400:
+            self.write_to_cache(result, cache_file, url)
+        else:
+            logger.info(
+                "Not write cache for {} url to {} response status_code {}".format(
+                    url, cache_file, response_status_code
+                )
+            )
         return result
 
     @staticmethod
@@ -296,7 +321,9 @@ class BaseHttpCache(ABC):
         except Exception as e:
             logger.warning("Unpickling failed for {}".format(cache_file))
             if self.strong_cache:
-                msg = "Error reading cached file: {}\n{}".format(str(e), str(cache_file))
+                msg = "Error reading cached file: {}\n{}".format(
+                    str(e), str(cache_file)
+                )
                 raise StrongCacheException(msg)
         return None
 
@@ -336,6 +363,10 @@ class RequestsHttpCaching(BaseHttpCache):
         response.request.headers = CaseInsensitiveDict()
         return response
 
+    def get_response_status_code(self, response: Any) -> int:
+        """Return response status code"""
+        return response.status_code
+
     def _enable(self):
         """Replacing the original function with a caching function"""
 
@@ -370,6 +401,10 @@ class HttpxHttpCaching(BaseHttpCache):
         response.headers = HTTPX__Headers()
         response.request.headers = HTTPX__Headers()
         return response
+
+    def get_response_status_code(self, response: Any) -> int:
+        """Return response status code"""
+        return response.status_code
 
     def _enable(self):
         """Replacing the original function with a caching function"""
@@ -412,6 +447,10 @@ class CurlCffiHttpCaching(BaseHttpCache):
         response.curl = None
         response.cookies.jar._cookies_lock = FakeRLock()
         return response
+
+    def get_response_status_code(self, response: Any) -> int:
+        """Return response status code"""
+        return response.status_code
 
     def _enable(self):
         """Replacing the original function with a caching function"""
