@@ -2,7 +2,7 @@
 name = "motleycache"
 version = "0.0.3"
 description = "Package for caching http requests"
-authors = ["MotleyCache <github@motleycrew.ai>"]
+authors = ["MotleyCrew <github@motleycrew.ai>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
