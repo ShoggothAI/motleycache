@@ -51,4 +51,4 @@ jobs:
       run: poetry run pytest
 
     - name: Tests coverage
-      run: poetry run pytest --cov=src tests/
+      run: poetry run pytest --cov=motleycache/tests/

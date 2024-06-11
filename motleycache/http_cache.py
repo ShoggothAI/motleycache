@@ -217,7 +217,7 @@ class BaseHttpCache(ABC):
         result = func(*args, **kwargs)
 
         response_status_code = self.get_response_status_code(result)
-        if response_status_code == 200:
+        if response_status_code < 400:
             self.write_to_cache(result, cache_file, url)
         else:
             logger.info(
@@ -245,7 +245,7 @@ class BaseHttpCache(ABC):
         result = await func(*args, **kwargs)
 
         response_status_code = self.get_response_status_code(result)
-        if response_status_code == 200:
+        if response_status_code < 400:
             self.write_to_cache(result, cache_file, url)
         else:
             logger.info(
